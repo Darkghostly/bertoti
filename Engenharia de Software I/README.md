@@ -290,3 +290,155 @@ class Pedido {
     public void adicionarItem(Livro livro, int quantidade) {
         ItemPedido novoItem = new ItemPedido(livro, quantidade);
         this.itens.add(novo
+
+   7. // Outro exemplo de diagrama
+
+   <img width="798" height="555" alt="image" src="https://github.com/user-attachments/assets/ec1f47f3-86e1-4cbb-8822-0f3b4bd3ee29" />
+
+
+   8. // Java respectivo
+  // Arquivo: SistemaBancario.java
+
+// --- Classe Cliente ---
+class Cliente {
+    private String nome;
+    private String cpf;
+
+    public Cliente(String nome, String cpf) {
+        this.nome = nome;
+        this.cpf = cpf;
+    }
+
+    public String getNome() { return nome; }
+    public String getCpf() { return cpf; }
+}
+
+// --- Classe Abstrata Conta ---
+abstract class Conta {
+    protected double saldo;
+    private int numero;
+    private Cliente titular;
+
+    public Conta(int numero, Cliente titular) {
+        this.numero = numero;
+        this.titular = titular;
+        this.saldo = 0.0;
+    }
+
+    public void depositar(double valor) {
+        if (valor > 0) {
+            this.saldo += valor;
+        }
+    }
+
+    // Retorna true se o saque foi bem-sucedido, false caso contrário
+    public boolean sacar(double valor) {
+        if (valor > 0 && saldo >= valor) {
+            saldo -= valor;
+            return true;
+        }
+        return false;
+    }
+
+    public double getSaldo() { return saldo; }
+    public Cliente getTitular() { return titular; }
+    public int getNumero() { return numero; }
+}
+
+// --- Classe ContaCorrente (com limite) ---
+class ContaCorrente extends Conta {
+    private double limite;
+
+    public ContaCorrente(int numero, Cliente titular, double limite) {
+        super(numero, titular);
+        this.limite = limite;
+    }
+
+    @Override
+    public boolean sacar(double valor) {
+        // Verifica se o valor pode ser sacado usando saldo + limite
+        if (valor > 0 && (saldo + limite) >= valor) {
+            saldo -= valor;
+            return true;
+        }
+        return false;
+    }
+
+    public double getLimite() { return limite; }
+}
+
+// --- Classe ContaPoupanca (com rendimento) ---
+class ContaPoupanca extends Conta {
+
+    public ContaPoupanca(int numero, Cliente titular) {
+        super(numero, titular);
+    }
+
+    public void renderJuros(double taxa) {
+        if (saldo > 0) {
+            saldo += saldo * taxa;
+        }
+    }
+}
+
+   9. // Testes JUnit
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.*;
+
+class SistemaBancarioTest {
+
+    private Cliente cliente;
+    private ContaCorrente cc;
+    private ContaPoupanca cp;
+
+    @BeforeEach
+    void setUp() {
+        // Executado antes de CADA teste para garantir um estado limpo
+        cliente = new Cliente("João Silva", "123.456.789-00");
+        cc = new ContaCorrente(1001, cliente, 500.0); // Limite de 500
+        cp = new ContaPoupanca(2001, cliente);
+    }
+
+    @Test
+    void testDepositoConta() {
+        cc.depositar(1000.0);
+        assertEquals(1000.0, cc.getSaldo(), "O saldo deve ser 1000 após o depósito");
+    }
+
+    @Test
+    void testSaqueContaPoupancaSaldoInsuficiente() {
+        cp.depositar(100.0);
+        boolean resultado = cp.sacar(150.0); // Tenta sacar mais que o saldo
+        
+        assertFalse(resultado, "Saque não deve ser permitido sem saldo na poupança");
+        assertEquals(100.0, cp.getSaldo(), "Saldo não deve mudar após falha no saque");
+    }
+
+    @Test
+    void testSaqueContaCorrenteUsandoLimite() {
+        cc.depositar(100.0);
+        // Tenta sacar 200. Tem 100 de saldo + 500 de limite. Deve permitir.
+        boolean resultado = cc.sacar(200.0);
+
+        assertTrue(resultado, "Saque deve ser permitido usando o limite");
+        assertEquals(-100.0, cc.getSaldo(), "Saldo deve ficar negativo dentro do limite");
+    }
+
+    @Test
+    void testSaqueContaCorrenteAcimaDoLimite() {
+        // Limite é 500, saldo é 0. Tenta sacar 600.
+        boolean resultado = cc.sacar(600.0);
+
+        assertFalse(resultado, "Saque acima do limite não deve ser permitido");
+    }
+
+    @Test
+    void testRenderJurosPoupanca() {
+        cp.depositar(1000.0);
+        cp.renderJuros(0.05); // 5% de rendimento
+
+        assertEquals(1050.0, cp.getSaldo(), 0.001, "Saldo deve ter aumentado 5%");
+    }
+}
