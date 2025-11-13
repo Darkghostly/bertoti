@@ -309,11 +309,7 @@ public class SistemaBancarioTest {
 
 <h style="background-color: rgba(22, 44, 37, 1); padding: 10px; z-index: -1; border-radius: 20px; border: 2px solid rgba(0, 236, 146, 1); border-bottom: none; margin-left: 20px;">
   9.Testes Automatizados
-</h>
-<div style="background-color: rgba(22, 44, 37, 1); padding: 30px; border: 2px solid rgba(0, 236, 146, 1); border-radius: 10px; margin-bottom: 30px">
-
-<div>
-
+  
       import org.junit.jupiter.api.Test;
       import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -352,8 +348,3 @@ public class SistemaBancarioTest {
                   assertEquals(32.0/3, museu.getEstrelas());
             }
       }
-</div>
-
-
-</div>
-
